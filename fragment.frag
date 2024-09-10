@@ -2,13 +2,23 @@
 out vec4 FragColor;
 
 in vec2 TexCoord;
+in vec3 FragPos;  // Add this to get the fragment position
 
-// texture samplers
 uniform sampler2D texture1;
 uniform sampler2D texture2;
 
 void main()
 {
-	// linearly interpolate between both textures (80% container, 20% awesomeface)
-	FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.2);
+    // Define a threshold for blending textures based on the y-coordinate
+    float boundary = -2.1; // Adjust this boundary based on your object's scale and shape
+
+    // If the y-coordinate is less than the boundary, use texture1 (bottom part), else use texture2 (top part)
+    if (FragPos.y < boundary)
+    {
+        FragColor = texture(texture1, TexCoord);
+    }
+    else
+    {
+        FragColor = texture(texture2, TexCoord);
+    }
 }

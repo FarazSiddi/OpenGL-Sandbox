@@ -1,3 +1,2 @@
 ﻿  main.cpp
-C:\Users\f1sid\source\repos\floating-island\main.cpp(172,28): warning C4101: 'texture2': unreferenced local variable
   floating-island.vcxproj -> C:\Users\f1sid\source\repos\floating-island\x64\Debug\floating-island.exe

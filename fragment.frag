@@ -6,19 +6,25 @@ in vec3 FragPos;  // Add this to get the fragment position
 
 uniform sampler2D texture1;
 uniform sampler2D texture2;
+uniform sampler2D texture3;
 
 void main()
 {
     // Define a threshold for blending textures based on the y-coordinate
-    float boundary = -2.1; // Adjust this boundary based on your object's scale and shape
+    float grassBoundary = -2.1; // Adjust this boundary based on your object's scale and shape
+    float snowBoundary = 3.0; // Adjust this boundary based on your object's scale and shape
 
     // If the y-coordinate is less than the boundary, use texture1 (bottom part), else use texture2 (top part)
-    if (FragPos.y < boundary)
+    if (FragPos.y < grassBoundary)
     {
         FragColor = texture(texture1, TexCoord);
     }
-    else
+    else if (FragPos.y < snowBoundary)
     {
         FragColor = texture(texture2, TexCoord);
-    }
+    } 
+    else
+	{
+		FragColor = texture(texture3, TexCoord);
+	}
 }

@@ -15,7 +15,7 @@ void main()
     // Define a threshold for blending textures based on the y-coordinate
     float grassBoundary = -2.1; // Adjust this boundary based on your object's scale and shape
     float treeBoundary = -1.999; // Adjust this boundary based on your object's scale and shape
-    float leafBoundary = -1.0; // Adjust this boundary based on your object's scale and shape
+    float leafBoundary = -1.001; // Adjust this boundary based on your object's scale and shape
     float snowBoundary = 3.0; // Adjust this boundary based on your object's scale and shape
 
     // If the y-coordinate is less than the boundary, use texture1 (bottom part), else use texture2 (top part)

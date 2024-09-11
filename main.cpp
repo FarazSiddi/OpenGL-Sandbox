@@ -172,7 +172,28 @@ int main()
 		-0.1f, 2.0f, -0.1f,  1.0f, 1.0f,
 
          // tree leaves
+		-0.5f, 2.0f, -0.5f,  0.0f, 0.0f,
+		0.0f, 3.5f, 0.0f,  1.0f, 0.0f,
+		0.5f, 2.0f, -0.5f,  1.0f, 1.0f,
 
+		0.5f, 2.0f, -0.5f,  0.0f, 0.0f,
+		0.0f, 3.5f, 0.0f,  1.0f, 0.0f,
+		0.5f, 2.0f, 0.5f,  1.0f, 1.0f,
+
+		0.5f, 2.0f, 0.5f,  0.0f, 0.0f,
+		0.0f, 3.5f, 0.0f,  1.0f, 0.0f,
+		-0.5f, 2.0f, 0.5f,  1.0f, 1.0f,
+
+		-0.5f, 2.0f, 0.5f, 0.0f, 0.0f,
+		0.0f, 3.5f, 0.0f, 1.0f, 0.0f,
+		-0.5f, 2.0f, -0.5f, 1.0f, 1.0f,
+
+		-0.5f, 2.0f, -0.5f, 0.0f, 0.0f,
+        0.5f, 2.0f, -0.5f, 1.0f, 1.0f,
+		0.5f, 2.0f, 0.5f, 1.0f, 0.0f,
+		0.5f, 2.0f, 0.5f, 0.0f, 0.0f,
+		-0.5f, 2.0f, 0.5f, 1.0f, 0.0f,
+		-0.5f, 2.0f, -0.5f, 1.0f, 1.0f
 
     };
     // world space positions of our cubes
@@ -207,7 +228,7 @@ int main()
 
     // load and create a texture 
     // -------------------------
-    unsigned int texture1, texture2, texture3, texture4;
+    unsigned int texture1, texture2, texture3, texture4, texture5;
     // texture 1
     // ---------
     glGenTextures(1, &texture1);
@@ -290,6 +311,29 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // load image, create texture and generate mipmaps
+    data = stbi_load(FileSystem::getPath("resources/textures/leaf.jpg").c_str(), &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+
+    // texture 5
+    // ---------
+    glGenTextures(1, &texture5);
+    glBindTexture(GL_TEXTURE_2D, texture5);
+    // set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // load image, create texture and generate mipmaps
     data = stbi_load(FileSystem::getPath("resources/textures/snow.jpg").c_str(), &width, &height, &nrChannels, 0);
     if (data)
     {
@@ -309,6 +353,7 @@ int main()
     ourShader.setInt("texture2", 1);
 	ourShader.setInt("texture3", 2);
 	ourShader.setInt("texture4", 3);
+    ourShader.setInt("texture5", 4);
 
     // render loop
     // -----------
@@ -365,6 +410,9 @@ int main()
 
 				glActiveTexture(GL_TEXTURE3);
 				glBindTexture(GL_TEXTURE_2D, texture4);
+
+				glActiveTexture(GL_TEXTURE4);
+				glBindTexture(GL_TEXTURE_2D, texture5);
             }
             else
             {
@@ -373,7 +421,7 @@ int main()
                 glBindTexture(GL_TEXTURE_2D, texture1);
             }
 
-            glDrawArrays(GL_TRIANGLES, 0, 66);
+            glDrawArrays(GL_TRIANGLES, 0, 84);
         }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)

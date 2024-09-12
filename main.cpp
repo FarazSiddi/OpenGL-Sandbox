@@ -200,14 +200,14 @@ int main()
     glm::vec3 cubePositions[] = {
         glm::vec3(0.0f,  -3.0f,  -3.0f),
         glm::vec3(2.0f,  5.0f, -15.0f),
-        // glm::vec3(-1.5f, -2.2f, -2.5f),
-        //glm::vec3(-3.8f, -2.0f, -12.3f),
-        // glm::vec3(2.4f, -0.4f, -3.5f),
-        //glm::vec3(-1.7f,  3.0f, -7.5f),
-        // glm::vec3(1.3f, -2.0f, -2.5f),
-        // glm::vec3(1.5f,  2.0f, -2.5f),
-        // glm::vec3(1.5f,  0.2f, -1.5f),
-        // glm::vec3(-1.3f,  1.0f, -1.5f)
+        glm::vec3(-1.5f, 12.2f, -2.5f),
+        glm::vec3(-6.8f, -2.0f, -12.3f),
+        glm::vec3(20.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f,  3.0f, 7.5f),
+        glm::vec3(1.3f, -2.4f, 5.5f),
+        glm::vec3(-11.5f,  2.0f, 2.5f),
+        glm::vec3(7.5f,  0.2f, -1.5f),
+        glm::vec3(-1.3f, -17.0f, -1.5f)
     };
     unsigned int VBO, VAO;
     glGenVertexArrays(1, &VAO);
@@ -397,23 +397,26 @@ int main()
             ourShader.setMat4("model", model);
 
             // Activate and bind both textures for blending
-            glActiveTexture(GL_TEXTURE0);
+
             glBindTexture(GL_TEXTURE_2D, texture1);
+			glDrawArrays(GL_TRIANGLES, 0, 18);
 
-            glActiveTexture(GL_TEXTURE1);
+
             glBindTexture(GL_TEXTURE_2D, texture2);
+            glDrawArrays(GL_TRIANGLES, 18, 18);
 
-            glActiveTexture(GL_TEXTURE2);
+
             glBindTexture(GL_TEXTURE_2D, texture3);
+            glDrawArrays(GL_TRIANGLES, 36, 30);
 
-			glActiveTexture(GL_TEXTURE3);
+
 			glBindTexture(GL_TEXTURE_2D, texture4);
+            glDrawArrays(GL_TRIANGLES, 66, 18);
 
-			glActiveTexture(GL_TEXTURE4);
-			glBindTexture(GL_TEXTURE_2D, texture5);
+			//glActiveTexture(GL_TEXTURE4);
+			//glBindTexture(GL_TEXTURE_2D, texture5);
 
 
-            glDrawArrays(GL_TRIANGLES, 0, 84);
         }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)

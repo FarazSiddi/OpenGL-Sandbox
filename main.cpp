@@ -392,9 +392,20 @@ int main()
             // calculate the model matrix for each object and pass it to shader before drawing
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, cubePositions[i]);
-            float angle = 20.0f * i;
-            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-            ourShader.setMat4("model", model);
+
+            if (i == 0)
+            {
+                // Horizontal rotation (around the y-axis)
+                float angle = 20.0f * i + glfwGetTime() * 12.5f;  // Adding glfwGetTime() for continuous rotation
+                model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
+
+                ourShader.setMat4("model", model);
+            }
+            else {
+                float angle = 20.0f * i;
+                model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+                ourShader.setMat4("model", model);
+            }
 
             // Activate and bind both textures for blending
 

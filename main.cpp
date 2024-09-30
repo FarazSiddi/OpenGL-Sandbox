@@ -402,8 +402,8 @@ int main()
                 ourShader.setMat4("model", model);
             }
             else {
-                float angle = 20.0f * i;
-                model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+                float angle = 20.0f * i + glfwGetTime() * 12.5f;  // Adding glfwGetTime() for continuous rotation
+                model = glm::rotate(model, glm::radians(angle), glm::vec3(10.0f, 20.0f, 5.0f));
                 ourShader.setMat4("model", model);
             }
 

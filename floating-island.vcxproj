@@ -71,8 +71,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\f1sid\cppLibraries\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\f1sid\cppLibraries\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\f1sid\source\repos\floating-island\dependencies\include;C:\Users\f1sid\cppLibraries\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\f1sid\source\repos\floating-island\dependencies\lib;C:\Users\f1sid\cppLibraries\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

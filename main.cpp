@@ -1,6 +1,9 @@
 #include <glad/glad.h>
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 #include "shader_m.h"
 #include "camera.h"
 
@@ -34,11 +37,15 @@ bool firstMouse = true;
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
+bool guiMode = false; // Start in simulation mode
+
 int main()
 {
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
+
+    const char* glsl_version = "#version 330";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -355,91 +362,122 @@ int main()
 	ourShader.setInt("texture4", 3);
     ourShader.setInt("texture5", 4);
 
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable 
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad 
+
+    ImGui::StyleColorsDark();
+
+    // Setup Platform/Renderer bindings
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init(glsl_version);
+
     // render loop
-    // -----------
     while (!glfwWindowShouldClose(window))
     {
-        // per-frame time logic
-        // --------------------
-        float currentFrame = static_cast<float>(glfwGetTime());
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
+        glfwPollEvents();
 
-        // input
-        // -----
-        processInput(window);
+        // Start the ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
 
-        // render
-        // ------
-        glClearColor(0.2f, 0.6f, 0.8f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        // activate shader
-        ourShader.use();
-
-        // pass projection matrix to shader (note that in this case it could change every frame)
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        ourShader.setMat4("projection", projection);
-
-        // camera/view transformation
-        glm::mat4 view = camera.GetViewMatrix();
-        ourShader.setMat4("view", view);
-
-        // render boxes
-        glBindVertexArray(VAO);
-        for (unsigned int i = 0; i < sizeof(cubePositions) / sizeof(cubePositions[0]); i++)  // Change this loop condition to apply only for the first object
+        // Example: Show a simple window
+        ImGui::Begin("Mode Toggle");
+        ImGui::Text("Press Tab to toggle between GUI and Simulation");
+        if (guiMode)
         {
-            // calculate the model matrix for each object and pass it to shader before drawing
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, cubePositions[i]);
+            ImGui::Text("Mode: GUI");
+        }
+        else
+        {
+            ImGui::Text("Mode: Simulation");
+        }
+        ImGui::End();
 
-            if (i == 0)
-            {
-                // Horizontal rotation (around the y-axis)
-                float angle = 20.0f * i + glfwGetTime() * 12.5f;  // Adding glfwGetTime() for continuous rotation
-                model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
+        // Check mode and process rendering logic accordingly
+        if (guiMode)
+        {
+            // Show cursor when in GUI mode
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
-                ourShader.setMat4("model", model);
-            }
-            else {
-                float angle = 20.0f * i + glfwGetTime() * 12.5f;  // Adding glfwGetTime() for continuous rotation
-                model = glm::rotate(model, glm::radians(angle), glm::vec3(10.0f, 20.0f, 5.0f));
-                ourShader.setMat4("model", model);
-            }
-
-            // Activate and bind both textures for blending
-
-            glBindTexture(GL_TEXTURE_2D, texture1);
-			glDrawArrays(GL_TRIANGLES, 0, 18);
-
-
-            glBindTexture(GL_TEXTURE_2D, texture2);
-            glDrawArrays(GL_TRIANGLES, 18, 18);
-
-
-            glBindTexture(GL_TEXTURE_2D, texture3);
-            glDrawArrays(GL_TRIANGLES, 36, 30);
-
-
-			glBindTexture(GL_TEXTURE_2D, texture4);
-            glDrawArrays(GL_TRIANGLES, 66, 18);
-
-			//glActiveTexture(GL_TEXTURE4);
-			//glBindTexture(GL_TEXTURE_2D, texture5);
-
+            // ImGui renders on top of OpenGL content
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        }
+        else
+        {
+            // Hide cursor when in simulation mode
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         }
 
-        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-        // -------------------------------------------------------------------------------
+        // Perform camera movement and render the OpenGL scene
+        int display_w, display_h;
+        glfwGetFramebufferSize(window, &display_w, &display_h);
+        glViewport(0, 0, display_w, display_h);
+        //glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
+        glClearColor(0.2f, 0.6f, 0.8f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // Render your OpenGL scene here...
+        // Use camera for movement and scene rendering
+
+        // activate shader and render your objects
+        ourShader.use();
+
+        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        ourShader.setMat4("projection", projection);
+
+        glm::mat4 view = camera.GetViewMatrix();
+        ourShader.setMat4("view", view);
+
+        glBindVertexArray(VAO);
+        for (unsigned int i = 0; i < sizeof(cubePositions) / sizeof(cubePositions[0]); i++)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, cubePositions[i]);
+
+            float angle = 20.0f * i + glfwGetTime() * 12.5f;  // Continuous rotation
+            if (i == 0) {
+                model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f)); // Rotate first object on Y-axis
+            }
+            else {
+                model = glm::rotate(model, glm::radians(angle), glm::vec3(10.0f, 20.0f, 5.0f)); // Rotate other objects
+            }
+            ourShader.setMat4("model", model);
+
+            glBindTexture(GL_TEXTURE_2D, texture1);
+            glDrawArrays(GL_TRIANGLES, 0, 18);
+            glBindTexture(GL_TEXTURE_2D, texture2);
+            glDrawArrays(GL_TRIANGLES, 18, 18);
+            glBindTexture(GL_TEXTURE_2D, texture3);
+            glDrawArrays(GL_TRIANGLES, 36, 30);
+            glBindTexture(GL_TEXTURE_2D, texture4);
+            glDrawArrays(GL_TRIANGLES, 66, 18);
+        }
+
+        // Render ImGui UI after OpenGL scene
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        // glfw: swap buffers
         glfwSwapBuffers(window);
-        glfwPollEvents();
+        
     }
 
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
+
+    // Cleanup ImGui
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
@@ -451,17 +489,48 @@ int main()
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow* window)
 {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
+    static bool tabPressedLastFrame = false;  // Keeps track of the tab key state
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, deltaTime);
+    // Check if Tab is pressed and not previously held down (to toggle mode)
+    if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS && !tabPressedLastFrame)
+    {
+        guiMode = !guiMode;  // Toggle the GUI mode
+        tabPressedLastFrame = true;  // Mark the tab as pressed this frame
+    }
+
+    // Reset tabPressedLastFrame when the Tab key is released
+    if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_RELEASE)
+    {
+        tabPressedLastFrame = false;  // Allow detection of new key press
+    }
+
+    // If we are in simulation mode, handle camera movements
+    if (!guiMode)
+    {
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+            glfwSetWindowShouldClose(window, true);
+
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            camera.ProcessKeyboard(FORWARD, deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            camera.ProcessKeyboard(BACKWARD, deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            camera.ProcessKeyboard(LEFT, deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            camera.ProcessKeyboard(RIGHT, deltaTime);
+    }
+
+    // In GUI mode, let ImGui capture inputs
+    if (guiMode)
+    {
+        ImGui::GetIO().WantCaptureKeyboard = true;
+        ImGui::GetIO().WantCaptureMouse = true;
+    }
+    else
+    {
+        ImGui::GetIO().WantCaptureKeyboard = false;
+        ImGui::GetIO().WantCaptureMouse = false;
+    }
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes

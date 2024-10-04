@@ -1,4 +1,3 @@
 ﻿  main.cpp
-C:\Users\f1sid\source\repos\floating-island\main.cpp(399,29): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\f1sid\source\repos\floating-island\main.cpp(405,29): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\f1sid\source\repos\floating-island\main.cpp(444,25): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
   floating-island.vcxproj -> C:\Users\f1sid\source\repos\floating-island\x64\Debug\floating-island.exe

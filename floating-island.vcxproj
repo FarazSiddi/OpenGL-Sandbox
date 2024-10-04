@@ -71,7 +71,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\f1sid\source\repos\floating-island\dependencies\include;C:\Users\f1sid\cppLibraries\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\f1sid\source\repos\floating-island\dependencies\include;C:\Users\f1sid\source\repos\floating-island\dependencies\include\imgui;C:\Users\f1sid\source\repos\floating-island\dependencies\include\imgui\backends;C:\Users\f1sid\cppLibraries\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\f1sid\source\repos\floating-island\dependencies\lib;C:\Users\f1sid\cppLibraries\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -108,7 +108,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\f1sid\source\repos\floating-island;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\f1sid\source\repos\floating-island;C:\Users\f1sid\source\repos\floating-island\dependencies\include\imgui;C:\Users\f1sid\source\repos\floating-island\dependencies\include\imgui\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -134,6 +134,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="glad.c" />
+    <ClCompile Include="imgui.cpp" />
+    <ClCompile Include="imgui_draw.cpp" />
+    <ClCompile Include="imgui_impl_glfw.cpp" />
+    <ClCompile Include="imgui_impl_opengl3.cpp" />
+    <ClCompile Include="imgui_tables.cpp" />
+    <ClCompile Include="imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>

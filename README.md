@@ -10,7 +10,7 @@ A 3D interactable sandbox using imgui and OpenGL
 </p>
 
 <p width="600">
-  idk wtf this is lmfao:
+  Here's another screenshot:
   </br>
     <img src="https://github.com/FarazSiddi/floating-island/blob/main/resources/screenshots/thumbnail2.png" alt="cgol" width="600" >
 </p>

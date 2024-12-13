@@ -61,8 +61,10 @@ public:
     // returns the view matrix calculated using Euler Angles and the LookAt Matrix
     glm::mat4 GetViewMatrix()
     {
+        std::cout << "Camera View Update - Position: (" << Position.x << ", " << Position.y << ", " << Position.z << ")" << std::endl;
         return glm::lookAt(Position, Position + Front, Up);
     }
+
 
     // processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
     void ProcessKeyboard(Camera_Movement direction, float deltaTime)
@@ -76,7 +78,11 @@ public:
             Position -= Right * velocity;
         if (direction == RIGHT)
             Position += Right * velocity;
+
+        // Debug: Print the updated position
+        std::cout << "Camera Position: (" << Position.x << ", " << Position.y << ", " << Position.z << ")" << std::endl;
     }
+
 
     // processes input received from a mouse input system. Expects the offset value in both the x and y direction.
     void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true)
@@ -114,15 +120,19 @@ private:
     // calculates the front vector from the Camera's (updated) Euler Angles
     void updateCameraVectors()
     {
-        // calculate the new Front vector
         glm::vec3 front;
         front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
         front.y = sin(glm::radians(Pitch));
         front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
         Front = glm::normalize(front);
-        // also re-calculate the Right and Up vector
-        Right = glm::normalize(glm::cross(Front, WorldUp));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-        Up = glm::normalize(glm::cross(Right, Front));
+        Right = glm::normalize(glm::cross(Front, WorldUp));  // Normalize Right
+        Up = glm::normalize(glm::cross(Right, Front));       // Normalize Up
+
+        // Debug: Print updated vectors
+        std::cout << "Front: (" << Front.x << ", " << Front.y << ", " << Front.z << ")"
+            << " Right: (" << Right.x << ", " << Right.y << ", " << Right.z << ")"
+            << " Up: (" << Up.x << ", " << Up.y << ", " << Up.z << ")" << std::endl;
     }
+
 };
 #endif

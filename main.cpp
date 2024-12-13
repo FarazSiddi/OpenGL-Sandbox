@@ -380,6 +380,17 @@ int main()
     while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
+        processInput(window);
+        glfwSetInputMode(window, GLFW_CURSOR, guiMode ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+
+        // Before starting ImGui's new frame in the main loop
+        ImGui::GetIO().WantCaptureMouse = guiMode;
+        ImGui::GetIO().WantCaptureKeyboard = guiMode;
+
+
+        //std::cout << "WantCaptureMouse: " << ImGui::GetIO().WantCaptureMouse
+        //    << ", WantCaptureKeyboard: " << ImGui::GetIO().WantCaptureKeyboard << std::endl;
+
 
         // Start the ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
@@ -399,21 +410,21 @@ int main()
         }
         ImGui::End();
 
-        // Check mode and process rendering logic accordingly
-        if (guiMode)
-        {
-            // Show cursor when in GUI mode
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        //// Check mode and process rendering logic accordingly
+        //if (guiMode)
+        //{
+        //    // Show cursor when in GUI mode
+        //    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
-            // ImGui renders on top of OpenGL content
-            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        }
-        else
-        {
-            // Hide cursor when in simulation mode
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        //    // ImGui renders on top of OpenGL content
+        //    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        //}
+        //else
+        //{
+        //    // Hide cursor when in simulation mode
+        //    /*glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);*/
 
-        }
+        //}
 
         // Perform camera movement and render the OpenGL scene
         int display_w, display_h;
@@ -485,28 +496,43 @@ int main()
     return 0;
 }
 
+bool tabPressedLastFrame = false; // To track Tab key state
+
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow* window)
 {
-    static bool tabPressedLastFrame = false;  // Keeps track of the tab key state
+    std::cout << "GUI Mode: " << guiMode
+    << ", WantCaptureMouse: " << ImGui::GetIO().WantCaptureMouse
+    << ", WantCaptureKeyboard: " << ImGui::GetIO().WantCaptureKeyboard << std::endl;
 
-    // Check if Tab is pressed and not previously held down (to toggle mode)
-    if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS && !tabPressedLastFrame)
+    static bool tabPressedLastFrame = false;
+
+    // Check if Tab was pressed
+    bool tabPressed = glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS;
+    if (tabPressed && !tabPressedLastFrame)
     {
-        guiMode = !guiMode;  // Toggle the GUI mode
-        tabPressedLastFrame = true;  // Mark the tab as pressed this frame
+        guiMode = !guiMode;
+
+        // Update cursor mode
+        glfwSetInputMode(window, GLFW_CURSOR, guiMode ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
     }
+    tabPressedLastFrame = tabPressed;
 
-    // Reset tabPressedLastFrame when the Tab key is released
-    if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_RELEASE)
+    // Handle input based on current mode
+    if (guiMode)
     {
-        tabPressedLastFrame = false;  // Allow detection of new key press
+        // ImGui captures input
+        ImGui::GetIO().WantCaptureMouse = true;
+        ImGui::GetIO().WantCaptureKeyboard = true;
     }
-
-    // If we are in simulation mode, handle camera movements
-    if (!guiMode)
+    else
     {
+        // GLFW should handle input in simulation mode
+        ImGui::GetIO().WantCaptureMouse = false;
+        ImGui::GetIO().WantCaptureKeyboard = false;
+
+        // GLFW keyboard controls for simulation
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, true);
 
@@ -519,19 +545,32 @@ void processInput(GLFWwindow* window)
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
             camera.ProcessKeyboard(RIGHT, deltaTime);
     }
+    //if (!guiMode)
+    //{
+    //    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    //    {
+    //        std::cout << "W key pressed for FORWARD movement\n";
+    //        camera.ProcessKeyboard(FORWARD, deltaTime);
+    //    }
+    //    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    //    {
+    //        std::cout << "S key pressed for BACKWARD movement\n";
+    //        camera.ProcessKeyboard(BACKWARD, deltaTime);
+    //    }
+    //    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    //    {
+    //        std::cout << "A key pressed for LEFT movement\n";
+    //        camera.ProcessKeyboard(LEFT, deltaTime);
+    //    }
+    //    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    //    {
+    //        std::cout << "D key pressed for RIGHT movement\n";
+    //        camera.ProcessKeyboard(RIGHT, deltaTime);
+    //    }
+    //}
 
-    // In GUI mode, let ImGui capture inputs
-    if (guiMode)
-    {
-        ImGui::GetIO().WantCaptureKeyboard = true;
-        ImGui::GetIO().WantCaptureMouse = true;
-    }
-    else
-    {
-        ImGui::GetIO().WantCaptureKeyboard = false;
-        ImGui::GetIO().WantCaptureMouse = false;
-    }
 }
+
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
@@ -544,26 +583,21 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
-void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
-    float xpos = static_cast<float>(xposIn);
-    float ypos = static_cast<float>(yposIn);
-
-    if (firstMouse)
+    if (!guiMode) // Only process mouse input in simulation mode
     {
+        float xoffset = xpos - lastX;
+        float yoffset = lastY - ypos; // Reversed since y-coordinates go from bottom to top
+
         lastX = xpos;
         lastY = ypos;
-        firstMouse = false;
+
+        camera.ProcessMouseMovement(xoffset, yoffset);
     }
-
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-
-    lastX = xpos;
-    lastY = ypos;
-
-    camera.ProcessMouseMovement(xoffset, yoffset);
 }
+
+
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
 // ----------------------------------------------------------------------

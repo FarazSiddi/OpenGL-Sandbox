@@ -34,7 +34,7 @@ float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 
 // timing
-float deltaTime = 0.01f;	// time between current frame and last frame
+float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
 bool guiMode = false; // Start in simulation mode
@@ -379,6 +379,12 @@ int main()
     // render loop
     while (!glfwWindowShouldClose(window))
     {
+        float currentFrame = static_cast<float>(glfwGetTime());
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
+        processInput(window);
+
         glfwPollEvents();
         glfwSetInputMode(window, GLFW_CURSOR, guiMode ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
 
@@ -394,8 +400,6 @@ int main()
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-
-        processInput(window);
 
         // Example: Show a simple window
         ImGui::Begin("Mode Toggle");

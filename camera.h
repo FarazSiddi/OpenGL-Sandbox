@@ -61,7 +61,7 @@ public:
     // returns the view matrix calculated using Euler Angles and the LookAt Matrix
     glm::mat4 GetViewMatrix()
     {
-        std::cout << "Camera View Update - Position: (" << Position.x << ", " << Position.y << ", " << Position.z << ")" << std::endl;
+       /* std::cout << "Camera View Update - Position: (" << Position.x << ", " << Position.y << ", " << Position.z << ")" << std::endl;*/
         return glm::lookAt(Position, Position + Front, Up);
     }
 
@@ -129,9 +129,9 @@ private:
         Up = glm::normalize(glm::cross(Right, Front));       // Normalize Up
 
         // Debug: Print updated vectors
-        std::cout << "Front: (" << Front.x << ", " << Front.y << ", " << Front.z << ")"
-            << " Right: (" << Right.x << ", " << Right.y << ", " << Right.z << ")"
-            << " Up: (" << Up.x << ", " << Up.y << ", " << Up.z << ")" << std::endl;
+        //std::cout << "Front: (" << Front.x << ", " << Front.y << ", " << Front.z << ")"
+        //    << " Right: (" << Right.x << ", " << Right.y << ", " << Right.z << ")"
+        //    << " Up: (" << Up.x << ", " << Up.y << ", " << Up.z << ")" << std::endl;
     }
 
 };

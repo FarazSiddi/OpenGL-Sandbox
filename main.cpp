@@ -34,7 +34,7 @@ float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 
 // timing
-float deltaTime = 0.0f;	// time between current frame and last frame
+float deltaTime = 0.01f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
 bool guiMode = false; // Start in simulation mode
@@ -380,13 +380,11 @@ int main()
     while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
-        processInput(window);
         glfwSetInputMode(window, GLFW_CURSOR, guiMode ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
 
         // Before starting ImGui's new frame in the main loop
         ImGui::GetIO().WantCaptureMouse = guiMode;
         ImGui::GetIO().WantCaptureKeyboard = guiMode;
-
 
         //std::cout << "WantCaptureMouse: " << ImGui::GetIO().WantCaptureMouse
         //    << ", WantCaptureKeyboard: " << ImGui::GetIO().WantCaptureKeyboard << std::endl;
@@ -396,6 +394,8 @@ int main()
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+
+        processInput(window);
 
         // Example: Show a simple window
         ImGui::Begin("Mode Toggle");
@@ -502,9 +502,9 @@ bool tabPressedLastFrame = false; // To track Tab key state
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow* window)
 {
-    std::cout << "GUI Mode: " << guiMode
-    << ", WantCaptureMouse: " << ImGui::GetIO().WantCaptureMouse
-    << ", WantCaptureKeyboard: " << ImGui::GetIO().WantCaptureKeyboard << std::endl;
+    //std::cout << "GUI Mode: " << guiMode
+    //<< ", WantCaptureMouse: " << ImGui::GetIO().WantCaptureMouse
+    //<< ", WantCaptureKeyboard: " << ImGui::GetIO().WantCaptureKeyboard << std::endl;
 
     static bool tabPressedLastFrame = false;
 
@@ -545,29 +545,30 @@ void processInput(GLFWwindow* window)
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
             camera.ProcessKeyboard(RIGHT, deltaTime);
     }
-    //if (!guiMode)
-    //{
-    //    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    //    {
-    //        std::cout << "W key pressed for FORWARD movement\n";
-    //        camera.ProcessKeyboard(FORWARD, deltaTime);
-    //    }
-    //    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    //    {
-    //        std::cout << "S key pressed for BACKWARD movement\n";
-    //        camera.ProcessKeyboard(BACKWARD, deltaTime);
-    //    }
-    //    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    //    {
-    //        std::cout << "A key pressed for LEFT movement\n";
-    //        camera.ProcessKeyboard(LEFT, deltaTime);
-    //    }
-    //    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    //    {
-    //        std::cout << "D key pressed for RIGHT movement\n";
-    //        camera.ProcessKeyboard(RIGHT, deltaTime);
-    //    }
-    //}
+    
+    if (!guiMode)
+    {
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        {
+            std::cout << "W key pressed for FORWARD movement\n";
+            camera.ProcessKeyboard(FORWARD, deltaTime);
+        }
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        {
+            std::cout << "S key pressed for BACKWARD movement\n";
+            camera.ProcessKeyboard(BACKWARD, deltaTime);
+        }
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        {
+            std::cout << "A key pressed for LEFT movement\n";
+            camera.ProcessKeyboard(LEFT, deltaTime);
+        }
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        {
+            std::cout << "D key pressed for RIGHT movement\n";
+            camera.ProcessKeyboard(RIGHT, deltaTime);
+        }
+    }
 
 }
 

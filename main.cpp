@@ -39,6 +39,12 @@ float lastFrame = 0.0f;
 
 bool guiMode = false; // Start in simulation mode
 
+// default values
+float bgColor[3] = { 0.2f, 0.6f, 0.8f }; // Default background color
+
+// GUI variables
+bool showGlobalSettings = false;
+
 int main()
 {
     // glfw: initialize and configure
@@ -402,6 +408,7 @@ int main()
         ImGui::NewFrame();
 
         // Example: Show a simple window
+        ImGui::SetNextWindowSize(ImVec2(400, 100), ImGuiCond_FirstUseEver);
         ImGui::Begin("Mode Toggle");
         ImGui::Text("Press Tab to toggle between GUI and Simulation");
         if (guiMode)
@@ -412,30 +419,30 @@ int main()
         {
             ImGui::Text("Mode: Simulation");
         }
+
+        if (ImGui::Button(showGlobalSettings ? "Hide Global Settings" : "Show Global Settings"))
+        {
+            showGlobalSettings = !showGlobalSettings;
+        }
         ImGui::End();
 
-        //// Check mode and process rendering logic accordingly
-        //if (guiMode)
-        //{
-        //    // Show cursor when in GUI mode
-        //    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-
-        //    // ImGui renders on top of OpenGL content
-        //    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        //}
-        //else
-        //{
-        //    // Hide cursor when in simulation mode
-        //    /*glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);*/
-
-        //}
+        // Show Global Settings Window if toggled on
+        if (showGlobalSettings)
+        {
+            ImGui::SetNextWindowSize(ImVec2(500, 200), ImGuiCond_FirstUseEver);
+            ImGui::Begin("Global Settings");
+            ImGui::Text("Adjust Background Color");
+            ImGui::ColorEdit3("Background Color", bgColor); // RGB sliders
+            ImGui::End();
+        }
 
         // Perform camera movement and render the OpenGL scene
         int display_w, display_h;
         glfwGetFramebufferSize(window, &display_w, &display_h);
         glViewport(0, 0, display_w, display_h);
-        //glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
-        glClearColor(0.2f, 0.6f, 0.8f, 1.0f);
+
+        // Update background color dynamically
+        glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Render your OpenGL scene here...

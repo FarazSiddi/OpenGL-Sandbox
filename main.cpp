@@ -45,6 +45,13 @@ float bgColor[3] = { 0.2f, 0.6f, 0.8f }; // Default background color
 // GUI variables
 bool showGlobalSettings = false;
 
+// Baseplate settings
+bool showBaseplate = true;                  
+float baseplateSize = 250.0f;               // Default size (250x250)
+float baseplateColor[3] = { 0.5f, 0.5f, 0.5f }; // Default color (gray)
+glm::vec3 baseplatePosition(0.0f, 0.0f, 0.0f); // Default position (origin)
+
+
 int main()
 {
     // glfw: initialize and configure
@@ -389,10 +396,80 @@ int main()
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
+		glm::vec3 cameraPosition = camera.Position;
+
         processInput(window);
 
         glfwPollEvents();
         glfwSetInputMode(window, GLFW_CURSOR, guiMode ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+
+        if (showBaseplate) // FIX THIS WHEN POSSIBLE
+        {
+            //glDisable(GL_CULL_FACE); // Disable culling to ensure the baseplate is visible from both sides
+
+            // Setup baseplate vertices
+            float halfSize = baseplateSize / 2.0f;
+            float baseplateVertices[] = {
+                // Positions (x, y, z)
+                -halfSize, 0.0f, -halfSize,
+                 halfSize, 0.0f, -halfSize,
+                 halfSize, 0.0f,  halfSize,
+                -halfSize, 0.0f,  halfSize
+            };
+
+            unsigned int baseplateIndices[] = {
+                0, 1, 2,
+                2, 3, 0
+            };
+
+            // Setup baseplate VAO/VBO/EBO (initialize once)
+            static unsigned int baseplateVAO = 0, baseplateVBO, baseplateEBO;
+            if (baseplateVAO == 0)
+            {
+                glGenVertexArrays(1, &baseplateVAO);
+                glGenBuffers(1, &baseplateVBO);
+                glGenBuffers(1, &baseplateEBO);
+
+                glBindVertexArray(baseplateVAO);
+
+                glBindBuffer(GL_ARRAY_BUFFER, baseplateVBO);
+                glBufferData(GL_ARRAY_BUFFER, sizeof(baseplateVertices), baseplateVertices, GL_DYNAMIC_DRAW);
+
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, baseplateEBO);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(baseplateIndices), baseplateIndices, GL_STATIC_DRAW);
+
+                // Position attribute
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+                glEnableVertexAttribArray(0);
+            }
+
+            // Update vertices dynamically for size changes
+            glBindBuffer(GL_ARRAY_BUFFER, baseplateVBO);
+            float updatedVertices[] = {
+                -halfSize, 0.0f, -halfSize,
+                 halfSize, 0.0f, -halfSize,
+                 halfSize, 0.0f,  halfSize,
+                -halfSize, 0.0f,  halfSize
+            };
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(updatedVertices), updatedVertices);
+
+            ourShader.use();
+
+            // Set the baseplate color uniform
+            ourShader.setVec3("baseplateColor", glm::vec3(baseplateColor[0], baseplateColor[1], baseplateColor[2]));
+
+            // Apply position offset
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, baseplatePosition);
+            ourShader.setMat4("model", model);
+
+            // Draw the baseplate
+            glBindVertexArray(baseplateVAO);
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+            glBindVertexArray(0);
+            //glEnable(GL_CULL_FACE);
+        }
+
 
         // Before starting ImGui's new frame in the main loop
         ImGui::GetIO().WantCaptureMouse = guiMode;
@@ -408,7 +485,7 @@ int main()
         ImGui::NewFrame();
 
         // Example: Show a simple window
-        ImGui::SetNextWindowSize(ImVec2(400, 100), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(400, 150), ImGuiCond_FirstUseEver);
         ImGui::Begin("Mode Toggle");
         ImGui::Text("Press Tab to toggle between GUI and Simulation");
         if (guiMode)
@@ -420,6 +497,12 @@ int main()
             ImGui::Text("Mode: Simulation");
         }
 
+        // Add camera coordinates
+        ImGui::Separator(); // Visual separator
+        ImGui::Text("Camera Coordinates: X: %.2f, Y: %.2f, Z: %.2f",
+            cameraPosition.x, cameraPosition.y, cameraPosition.z);
+        ImGui::Separator();
+
         if (ImGui::Button(showGlobalSettings ? "Hide Global Settings" : "Show Global Settings"))
         {
             showGlobalSettings = !showGlobalSettings;
@@ -429,12 +512,24 @@ int main()
         // Show Global Settings Window if toggled on
         if (showGlobalSettings)
         {
-            ImGui::SetNextWindowSize(ImVec2(500, 200), ImGuiCond_FirstUseEver);
+            ImGui::SetNextWindowSize(ImVec2(350, 300), ImGuiCond_FirstUseEver);
             ImGui::Begin("Global Settings");
+
+            // Background color settings
             ImGui::Text("Adjust Background Color");
-            ImGui::ColorEdit3("Background Color", bgColor); // RGB sliders
+            ImGui::ColorEdit3("Background Color", bgColor);
+
+            // Baseplate settings
+            ImGui::Separator();
+            ImGui::Text("Baseplate Settings");
+            ImGui::Checkbox("Show Baseplate", &showBaseplate);
+            ImGui::DragFloat("Baseplate Size", &baseplateSize, 1.0f, 1.0f, 1000.0f, "%.1f");
+            ImGui::ColorEdit3("Baseplate Color", baseplateColor);
+            ImGui::DragFloat3("Baseplate Position", &baseplatePosition[0], 1.0f, -500.0f, 500.0f, "%.1f");
+
             ImGui::End();
         }
+
 
         // Perform camera movement and render the OpenGL scene
         int display_w, display_h;

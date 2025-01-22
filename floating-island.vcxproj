@@ -149,6 +149,8 @@
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="baseplate.frag" />
+    <None Include="baseplate.vert" />
     <None Include="fragment.frag" />
     <None Include="vertex.vert" />
   </ItemGroup>

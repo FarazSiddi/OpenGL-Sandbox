@@ -61,5 +61,11 @@
     <None Include="vertex.vert">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="baseplate.frag">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="baseplate.vert">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

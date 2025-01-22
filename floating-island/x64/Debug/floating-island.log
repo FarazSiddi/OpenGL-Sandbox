@@ -1,7 +1,15 @@
-﻿  main.cpp
-C:\Users\f1sid\source\repos\floating-island\main.cpp(561,25): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\f1sid\source\repos\floating-island\main.cpp(697,23): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+﻿  glad.c
+  imgui.cpp
+  imgui_draw.cpp
+  imgui_impl_glfw.cpp
+  imgui_impl_opengl3.cpp
+  imgui_tables.cpp
+  imgui_widgets.cpp
+  main.cpp
+C:\Users\f1sid\source\repos\floating-island\main.cpp(562,25): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 C:\Users\f1sid\source\repos\floating-island\main.cpp(698,23): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\f1sid\source\repos\floating-island\main.cpp(700,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\f1sid\source\repos\floating-island\main.cpp(699,23): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 C:\Users\f1sid\source\repos\floating-island\main.cpp(701,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\f1sid\source\repos\floating-island\main.cpp(702,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  Generating Code...
   floating-island.vcxproj -> C:\Users\f1sid\source\repos\floating-island\x64\Debug\floating-island.exe

@@ -46,7 +46,7 @@ float bgColor[3] = { 0.2f, 0.6f, 0.8f }; // Default background color
 bool showGlobalSettings = false;
 
 // Baseplate settings
-bool showBaseplate = true;                  
+bool showBaseplate = false;                  
 float baseplateSize = 250.0f;               // Default size (250x250)
 float baseplateColor[3] = { 0.5f, 0.5f, 0.5f }; // Default color (gray)
 glm::vec3 baseplatePosition(0.0f, 0.0f, 0.0f); // Default position (origin)
@@ -96,9 +96,13 @@ int main()
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
 
+    glDisable(GL_CULL_FACE);
+
+
     // build and compile our shader zprogram
     // ------------------------------------
     Shader ourShader("vertex.vert", "fragment.frag");
+	Shader baseplateShader("baseplate.vert", "baseplate.frag");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -380,7 +384,7 @@ int main()
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
 
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable 
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable keyboard
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad 
 
     ImGui::StyleColorsDark();
@@ -403,26 +407,28 @@ int main()
         glfwPollEvents();
         glfwSetInputMode(window, GLFW_CURSOR, guiMode ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
 
-        if (showBaseplate) // FIX THIS WHEN POSSIBLE
-        {
-            //glDisable(GL_CULL_FACE); // Disable culling to ensure the baseplate is visible from both sides
+        glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
+        if (showBaseplate)
+        {
             // Setup baseplate vertices
             float halfSize = baseplateSize / 2.0f;
             float baseplateVertices[] = {
-                // Positions (x, y, z)
-                -halfSize, 0.0f, -halfSize,
-                 halfSize, 0.0f, -halfSize,
-                 halfSize, 0.0f,  halfSize,
-                -halfSize, 0.0f,  halfSize
+                // Positions
+                -halfSize, 0.0f, -halfSize, // Bottom-left
+                 halfSize, 0.0f, -halfSize, // Bottom-right
+                 halfSize, 0.0f,  halfSize, // Top-right
+                -halfSize, 0.0f,  halfSize  // Top-left
             };
 
             unsigned int baseplateIndices[] = {
-                0, 1, 2,
-                2, 3, 0
+                0, 1, 2, // First triangle
+                2, 3, 0  // Second triangle
             };
 
-            // Setup baseplate VAO/VBO/EBO (initialize once)
+            // Static VAO/VBO/EBO
             static unsigned int baseplateVAO = 0, baseplateVBO, baseplateEBO;
             if (baseplateVAO == 0)
             {
@@ -433,7 +439,7 @@ int main()
                 glBindVertexArray(baseplateVAO);
 
                 glBindBuffer(GL_ARRAY_BUFFER, baseplateVBO);
-                glBufferData(GL_ARRAY_BUFFER, sizeof(baseplateVertices), baseplateVertices, GL_DYNAMIC_DRAW);
+                glBufferData(GL_ARRAY_BUFFER, sizeof(baseplateVertices), baseplateVertices, GL_STATIC_DRAW);
 
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, baseplateEBO);
                 glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(baseplateIndices), baseplateIndices, GL_STATIC_DRAW);
@@ -443,32 +449,30 @@ int main()
                 glEnableVertexAttribArray(0);
             }
 
-            // Update vertices dynamically for size changes
-            glBindBuffer(GL_ARRAY_BUFFER, baseplateVBO);
-            float updatedVertices[] = {
-                -halfSize, 0.0f, -halfSize,
-                 halfSize, 0.0f, -halfSize,
-                 halfSize, 0.0f,  halfSize,
-                -halfSize, 0.0f,  halfSize
-            };
-            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(updatedVertices), updatedVertices);
+            // Render the baseplate
+            baseplateShader.use();
 
-            ourShader.use();
+            // Pass the camera matrices
+            glm::mat4 view = camera.GetViewMatrix();
+            glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom),
+                (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
+            baseplateShader.setMat4("view", view);
+            baseplateShader.setMat4("projection", projection);
 
-            // Set the baseplate color uniform
-            ourShader.setVec3("baseplateColor", glm::vec3(baseplateColor[0], baseplateColor[1], baseplateColor[2]));
+            // Build/translate the model matrix
+            glm::mat4 baseplateModel = glm::mat4(1.0f);
+            baseplateModel = glm::translate(baseplateModel, baseplatePosition);
+            baseplateShader.setMat4("model", baseplateModel);
 
-            // Apply position offset
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, baseplatePosition);
-            ourShader.setMat4("model", model);
+            // Set the baseplate color from the GUI color palette
+            baseplateShader.setVec3("baseplateColor", glm::vec3(baseplateColor[0], baseplateColor[1], baseplateColor[2]));
 
-            // Draw the baseplate
+            // Bind VAO and draw
             glBindVertexArray(baseplateVAO);
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
             glBindVertexArray(0);
-            //glEnable(GL_CULL_FACE);
         }
+
 
 
         // Before starting ImGui's new frame in the main loop
@@ -536,9 +540,6 @@ int main()
         glfwGetFramebufferSize(window, &display_w, &display_h);
         glViewport(0, 0, display_w, display_h);
 
-        // Update background color dynamically
-        glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Render your OpenGL scene here...
         // Use camera for movement and scene rendering

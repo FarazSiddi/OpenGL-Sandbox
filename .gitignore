@@ -4,3 +4,4 @@ build/
 /.vs
 .idea/
 CMakeSettings.json
+floating-island/x64/Debug

@@ -1,4 +1,4 @@
-# floating-island
+# OpenGL Sandbox
 An interactable 3D sandbox involving various polygons using OpenGL (GFLW and GLAD) and Imgui.
 
 ## Screenshots

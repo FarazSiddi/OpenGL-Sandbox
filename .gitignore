@@ -5,3 +5,4 @@ build/
 .idea/
 CMakeSettings.json
 floating-island/x64/Debug
+x64/Debug

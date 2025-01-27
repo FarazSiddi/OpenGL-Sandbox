@@ -25,8 +25,8 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 1600;
+const unsigned int SCR_HEIGHT = 1200;
 
 // camera
 Camera camera(glm::vec3(0.0f, 3.0f, 3.0f));
@@ -48,7 +48,15 @@ bool showGlobalSettings = false;
 
 // Baseplate settings
 bool showBaseplate = false;                  
-float baseplateSize = 250.0f;               // Default size (250x250)
+float baseplateSize = 125.0f;               // Default size (250x250)
+// A 1x1 square centered at (0,0):
+float baseplateVertices[] = {
+    -0.5f, 0.0f, -0.5f,  // Bottom-left
+     0.5f, 0.0f, -0.5f,  // Bottom-right
+     0.5f, 0.0f,  0.5f,  // Top-right
+    -0.5f, 0.0f,  0.5f   // Top-left
+};
+
 float baseplateColor[3] = { 0.1f, 0.5f, 0.1f }; // Default color (green)
 glm::vec3 baseplatePosition(0.0f, 0.0f, 0.0f); // Default position (origin)
 
@@ -304,16 +312,6 @@ int main()
 
         if (showBaseplate)
         {
-            // Setup baseplate vertices
-            float halfSize = baseplateSize / 2.0f;
-            float baseplateVertices[] = {
-                // Positions
-                -halfSize, 0.0f, -halfSize, // Bottom-left
-                 halfSize, 0.0f, -halfSize, // Bottom-right
-                 halfSize, 0.0f,  halfSize, // Top-right
-                -halfSize, 0.0f,  halfSize  // Top-left
-            };
-
             unsigned int baseplateIndices[] = {
                 0, 1, 2, // First triangle
                 2, 3, 0  // Second triangle
@@ -350,10 +348,18 @@ int main()
             baseplateShader.setMat4("view", view);
             baseplateShader.setMat4("projection", projection);
 
-            // Build/translate the model matrix
+            // ---------- Build/translate the model matrix ----------
+            // 1. Build the base (translation) part:
             glm::mat4 baseplateModel = glm::mat4(1.0f);
             baseplateModel = glm::translate(baseplateModel, baseplatePosition);
+
+            // 2. Scale in X and Z by baseplateSize
+            //    If you want 1.0 == 1x1 plane, but "baseplateSize" means NxN, 
+            //    then scale by baseplateSize on X and Z axes:
+            baseplateModel = glm::scale(baseplateModel, glm::vec3(baseplateSize, 1.0f, baseplateSize));
+
             baseplateShader.setMat4("model", baseplateModel);
+
 
             // Set the baseplate color from the GUI color palette
             baseplateShader.setVec3("baseplateColor", glm::vec3(baseplateColor[0], baseplateColor[1], baseplateColor[2]));
@@ -548,22 +554,22 @@ void processInput(GLFWwindow* window)
     {
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         {
-            std::cout << "W key pressed for FORWARD movement\n";
+            //std::cout << "W key pressed for FORWARD movement\n";
             camera.ProcessKeyboard(FORWARD, deltaTime);
         }
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
         {
-            std::cout << "S key pressed for BACKWARD movement\n";
+            //std::cout << "S key pressed for BACKWARD movement\n";
             camera.ProcessKeyboard(BACKWARD, deltaTime);
         }
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         {
-            std::cout << "A key pressed for LEFT movement\n";
+            //std::cout << "A key pressed for LEFT movement\n";
             camera.ProcessKeyboard(LEFT, deltaTime);
         }
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         {
-            std::cout << "D key pressed for RIGHT movement\n";
+            //std::cout << "D key pressed for RIGHT movement\n";
             camera.ProcessKeyboard(RIGHT, deltaTime);
         }
     }

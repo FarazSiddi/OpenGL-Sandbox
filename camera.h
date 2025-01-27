@@ -83,7 +83,7 @@ public:
             Position += Right * velocity;
 
         // Debug: Print the updated position
-        std::cout << "Camera Position: (" << Position.x << ", " << Position.y << ", " << Position.z << ")" << std::endl;
+        //std::cout << "Camera Position: (" << Position.x << ", " << Position.y << ", " << Position.z << ")" << std::endl;
     }
 
 

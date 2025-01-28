@@ -6,8 +6,10 @@
 #include "imgui_impl_opengl3.h"
 #include "shader_m.h"
 #include "camera.h"
+#include "cube.h"
 
 #include <iostream>
+#include <vector>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -59,6 +61,9 @@ float baseplateVertices[] = {
 
 float baseplateColor[3] = { 0.1f, 0.5f, 0.1f }; // Default color (green)
 glm::vec3 baseplatePosition(0.0f, 0.0f, 0.0f); // Default position (origin)
+
+// A container of shape pointers
+std::vector<BaseShape*> g_Shapes;
 
 
 int main()
@@ -370,8 +375,6 @@ int main()
             glBindVertexArray(0);
         }
 
-
-
         // Before starting ImGui's new frame in the main loop
         ImGui::GetIO().WantCaptureMouse = guiMode;
         ImGui::GetIO().WantCaptureKeyboard = guiMode;
@@ -475,6 +478,17 @@ int main()
             glDrawArrays(GL_TRIANGLES, 66, 18);
         }
 
+
+        // After you've set up your projection and view matrices, and your "mainShader"
+        // or any other shape-specific shader:
+
+        for (auto shape : g_Shapes)
+        {
+            // You might choose to pass the ID of the shader for shapes
+            // or each shape might store its own shader handle
+            shape->draw(view, projection, mainShader.ID);
+        }
+
         // Render ImGui UI after OpenGL scene
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -494,6 +508,12 @@ int main()
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 
+	// Delete all shapes upon exit
+    for (auto shape : g_Shapes)
+        delete shape;
+    g_Shapes.clear();
+
+
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();
@@ -510,7 +530,8 @@ void processInput(GLFWwindow* window)
     //<< ", WantCaptureMouse: " << ImGui::GetIO().WantCaptureMouse
     //<< ", WantCaptureKeyboard: " << ImGui::GetIO().WantCaptureKeyboard << std::endl;
 
-    static bool tabPressedLastFrame = false;
+	static bool tabPressedLastFrame = false; // To track Tab key state
+    static bool key1PressedLastFrame = false;
 
     // Check if Tab was pressed
     bool tabPressed = glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS;
@@ -522,6 +543,31 @@ void processInput(GLFWwindow* window)
         glfwSetInputMode(window, GLFW_CURSOR, guiMode ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
     }
     tabPressedLastFrame = tabPressed;
+
+    // Suppose user presses numeric keys to spawn shapes
+    bool key1IsPressed = (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS);
+    if (key1IsPressed && !key1PressedLastFrame)
+    {
+        // Create a new Cube
+        Cube* newCube = new Cube();
+        newCube->init(); // sets up VAO
+        // Distance in front of the camera to place the cube
+        float spawnDistance = 2.0f;
+        glm::vec3 spawnPos = camera.Position + camera.Front * spawnDistance;
+
+        // Assign that position to the new cube
+        newCube->position = spawnPos;
+        newCube->scale = glm::vec3(1.0f);
+
+        // Finally, add it to the vector so it’s drawn each frame
+        g_Shapes.push_back(newCube);
+    }
+    key1PressedLastFrame = key1IsPressed;
+    //else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+    //{
+    //    // create sphere, etc.
+    //}
+
 
     // Handle input based on current mode
     if (guiMode)

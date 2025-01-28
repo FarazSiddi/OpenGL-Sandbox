@@ -143,7 +143,9 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="baseShape.h" />
     <ClInclude Include="camera.h" />
+    <ClInclude Include="cube.h" />
     <ClInclude Include="filesystem.h" />
     <ClInclude Include="shader_m.h" />
     <ClInclude Include="stb_image.h" />

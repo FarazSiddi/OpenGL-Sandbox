@@ -148,6 +148,7 @@
     <ClInclude Include="cube.h" />
     <ClInclude Include="filesystem.h" />
     <ClInclude Include="shader_m.h" />
+    <ClInclude Include="sphere.h" />
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>

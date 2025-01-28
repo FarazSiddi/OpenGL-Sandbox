@@ -109,9 +109,7 @@ int main()
     // configure global opengl state
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
-
     glDisable(GL_CULL_FACE);
-
 
     // build and compile our shader program
     // ------------------------------------
@@ -359,8 +357,6 @@ int main()
             baseplateModel = glm::translate(baseplateModel, baseplatePosition);
 
             // 2. Scale in X and Z by baseplateSize
-            //    If you want 1.0 == 1x1 plane, but "baseplateSize" means NxN, 
-            //    then scale by baseplateSize on X and Z axes:
             baseplateModel = glm::scale(baseplateModel, glm::vec3(baseplateSize, 1.0f, baseplateSize));
 
             baseplateShader.setMat4("model", baseplateModel);
@@ -388,7 +384,7 @@ int main()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        // Example: Show a simple window
+        // Display the main window
         ImGui::SetNextWindowSize(ImVec2(400, 150), ImGuiCond_FirstUseEver);
         ImGui::Begin("Mode Toggle");
         ImGui::Text("Press Tab to toggle between GUI and Simulation");
@@ -444,7 +440,7 @@ int main()
         // Render your OpenGL scene here...
         // Use camera for movement and scene rendering
 
-        // activate shader and render your objects
+        // Activate shader and render the objects
         mainShader.use();
 
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -478,9 +474,7 @@ int main()
             glDrawArrays(GL_TRIANGLES, 66, 18);
         }
 
-
-        // After you've set up your projection and view matrices, and your "mainShader"
-        // or any other shape-specific shader:
+        // Shape-specific shaders go here:
 
         for (auto shape : g_Shapes)
         {
@@ -551,6 +545,7 @@ void processInput(GLFWwindow* window)
         // Create a new Cube
         Cube* newCube = new Cube();
         newCube->init(); // sets up VAO
+
         // Distance in front of the camera to place the cube
         float spawnDistance = 2.0f;
         glm::vec3 spawnPos = camera.Position + camera.Front * spawnDistance;
@@ -622,7 +617,6 @@ void processInput(GLFWwindow* window)
 
 }
 
-
 void loadTexture(unsigned int& textureName, const std::string& path)
 {
     glGenTextures(1, &textureName);
@@ -673,8 +667,6 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
         camera.ProcessMouseMovement(xoffset, yoffset);
     }
 }
-
-
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
 // ----------------------------------------------------------------------

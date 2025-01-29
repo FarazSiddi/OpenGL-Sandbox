@@ -1,21 +1,28 @@
 #include <glad/glad.h>
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+
+// IMGUI
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+
+// Helper functions
 #include "shader_m.h"
 #include "camera.h"
+#include "filesystem.h"
+
+// Polyhedrons
 #include "cube.h"
+#include "sphere.h"
 
 #include <iostream>
 #include <vector>
 
+// GLM
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
-#include "filesystem.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -526,6 +533,7 @@ void processInput(GLFWwindow* window)
 
 	static bool tabPressedLastFrame = false; // To track Tab key state
     static bool key1PressedLastFrame = false;
+	static bool key2PressedLastFrame = false;
 
     // Check if Tab was pressed
     bool tabPressed = glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS;
@@ -558,6 +566,24 @@ void processInput(GLFWwindow* window)
         g_Shapes.push_back(newCube);
     }
     key1PressedLastFrame = key1IsPressed;
+
+	bool key2IsPressed = (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS);
+    if (key2IsPressed && !key2PressedLastFrame)
+    {
+        // e.g. create a sphere with 16 slices, 16 stacks
+        Sphere* newSphere = new Sphere(16, 16);
+        newSphere->init();
+
+        // Put it 2 units in front of the camera
+        float spawnDistance = 2.0f;
+        glm::vec3 spawnPos = camera.Position + camera.Front * spawnDistance;
+        newSphere->position = spawnPos;
+        newSphere->scale = glm::vec3(1.0f);
+
+        g_Shapes.push_back(newSphere);
+    }
+    key2PressedLastFrame = key2IsPressed;
+
     //else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
     //{
     //    // create sphere, etc.

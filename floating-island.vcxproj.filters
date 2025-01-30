@@ -62,6 +62,9 @@
     <ClInclude Include="sphere.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="pyramid.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment.frag">

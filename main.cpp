@@ -15,6 +15,7 @@
 // Polyhedrons
 #include "cube.h"
 #include "sphere.h"
+#include "pyramid.h"
 
 #include <iostream>
 #include <vector>
@@ -534,6 +535,7 @@ void processInput(GLFWwindow* window)
 	static bool tabPressedLastFrame = false; // To track Tab key state
     static bool key1PressedLastFrame = false;
 	static bool key2PressedLastFrame = false;
+    static bool key3PressedLastFrame = false;
 
     // Check if Tab was pressed
     bool tabPressed = glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS;
@@ -583,6 +585,22 @@ void processInput(GLFWwindow* window)
         g_Shapes.push_back(newSphere);
     }
     key2PressedLastFrame = key2IsPressed;
+
+    bool key3IsPressed = (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS);
+    if (key3IsPressed && !key3PressedLastFrame)
+    {
+        Pyramid* newPyramid = new Pyramid();
+        newPyramid->init();
+
+        // Place 2 units in front of the camera
+        float spawnDistance = 2.0f;
+        glm::vec3 spawnPos = camera.Position + camera.Front * spawnDistance;
+        newPyramid->position = spawnPos;
+        newPyramid->scale = glm::vec3(1.0f);
+
+        g_Shapes.push_back(newPyramid);
+    }
+    key3PressedLastFrame = key3IsPressed;
 
     //else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
     //{

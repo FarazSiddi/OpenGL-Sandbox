@@ -65,6 +65,9 @@
     <ClInclude Include="pyramid.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="cylinder.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment.frag">

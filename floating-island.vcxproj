@@ -146,6 +146,7 @@
     <ClInclude Include="baseShape.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="cube.h" />
+    <ClInclude Include="cylinder.h" />
     <ClInclude Include="filesystem.h" />
     <ClInclude Include="pyramid.h" />
     <ClInclude Include="shader_m.h" />

@@ -16,7 +16,9 @@
 #include "cube.h"
 #include "sphere.h"
 #include "pyramid.h"
+#include "cylinder.h"
 
+// Built-in libraries
 #include <iostream>
 #include <vector>
 
@@ -25,6 +27,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+// STB Image
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -536,6 +539,7 @@ void processInput(GLFWwindow* window)
     static bool key1PressedLastFrame = false;
 	static bool key2PressedLastFrame = false;
     static bool key3PressedLastFrame = false;
+    static bool key4PressedLastFrame = false;
 
     // Check if Tab was pressed
     bool tabPressed = glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS;
@@ -601,6 +605,23 @@ void processInput(GLFWwindow* window)
         g_Shapes.push_back(newPyramid);
     }
     key3PressedLastFrame = key3IsPressed;
+
+    bool key4IsPressed = (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS);
+    if (key4IsPressed && !key4PressedLastFrame)
+    {
+        // Create a new Cylinder with 16 slices, radius=0.5, height=1.0
+        Cylinder* newCyl = new Cylinder(16, 0.5f, 1.0f);
+        newCyl->init();
+
+        // Place it in front of the camera
+        float spawnDistance = 2.0f;
+        glm::vec3 spawnPos = camera.Position + camera.Front * spawnDistance;
+        newCyl->position = spawnPos;
+        newCyl->scale = glm::vec3(1.0f);
+
+        g_Shapes.push_back(newCyl);
+    }
+    key4PressedLastFrame = key4IsPressed;
 
     //else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
     //{
